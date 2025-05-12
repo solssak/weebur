@@ -9,8 +9,13 @@ export type ProductItem = {
   id: number;
   title: string;
   description: string;
-  category: string;
-  price: number;
   rating: number;
   thumbnail: string;
+  reviews: Review[];
+};
+
+export type Review = {
+  id: number;
+  rating: number;
+  comment: string;
 };
