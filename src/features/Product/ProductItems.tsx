@@ -1,11 +1,7 @@
 'use client';
 
-import {
-  ProductItem,
-  VIEW_MODE_KEY,
-  VIEW_MODE_EXPIRY_KEY,
-  VIEW_MODE,
-} from '@/types/Product';
+import { ProductItem, VIEW_MODE } from '@/types/Product';
+import { initializeViewMode } from '@/utils/initializeViewMode';
 import { Grid } from './Grid';
 import { List } from './List';
 import { useState, useEffect } from 'react';
@@ -21,28 +17,7 @@ export const ProductItems = () => {
   const [viewMode, setViewMode] = useState<VIEW_MODE>('grid');
 
   useEffect(() => {
-    const loadViewMode = () => {
-      const savedViewMode = localStorage.getItem(VIEW_MODE_KEY);
-      const expiryTime = localStorage.getItem(VIEW_MODE_EXPIRY_KEY);
-
-      if (
-        savedViewMode &&
-        expiryTime &&
-        new Date().getTime() < parseInt(expiryTime)
-      ) {
-        setViewMode(savedViewMode as VIEW_MODE);
-      } else {
-        const newViewMode = Math.random() < 0.5 ? 'grid' : 'list';
-        setViewMode(newViewMode);
-        localStorage.setItem(VIEW_MODE_KEY, newViewMode);
-        localStorage.setItem(
-          VIEW_MODE_EXPIRY_KEY,
-          (new Date().getTime() + 24 * 60 * 60 * 1000).toString(),
-        );
-      }
-    };
-
-    loadViewMode();
+    setViewMode(initializeViewMode());
   }, []);
 
   useEffect(() => {
