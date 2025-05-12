@@ -1,32 +1,67 @@
 'use client';
 
-import { ProductResponse } from '@/types/Product';
+import { ProductItem } from '@/types/Product';
 import Image from 'next/image';
+import { forwardRef } from 'react';
 
-export const List = ({ product }: { product: ProductResponse }) => {
-  return (
-    <div className="flex flex-col gap-4 p-4">
-      {product.products.map((product: any) => (
-        <div key={product.id}>
-          <div className="flex gap-4">
-            <div>
-              <Image
-                src={product.thumbnail}
-                alt={product.title}
-                width={100}
-                height={100}
-              />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold">{product.title}</h2>
-              <p className="text-sm text-gray-500">{product.rating}</p>
-              <p className="text-sm text-gray-500 line-clamp-2">
-                {product.description}
-              </p>
+interface ListProps {
+  product: ProductItem[];
+  hasMore: boolean;
+  isLoadingMore: boolean;
+}
+
+export const List = forwardRef<HTMLDivElement, ListProps>(
+  ({ product, hasMore, isLoadingMore }, ref) => {
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        {product.map((product) => (
+          <div
+            key={product.id}
+            className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200"
+          >
+            <div className="flex gap-6">
+              <div className="relative w-48 h-48 flex-shrink-0">
+                <Image
+                  src={product.thumbnail}
+                  alt={product.title}
+                  fill
+                  sizes="192px"
+                  className="object-cover rounded-lg"
+                />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold mb-2 line-clamp-1">
+                  {product.title}
+                </h2>
+                <p className="text-gray-600 mb-4 line-clamp-2">
+                  {product.description}
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-yellow-500 font-medium">
+                    ⭐ {product.rating}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-gray-500">
+                    💬 {product.reviews.length}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
-  );
-};
+        ))}
+
+        {hasMore && (
+          <div
+            ref={ref}
+            className="col-span-4 flex justify-center items-center h-20"
+          >
+            {isLoadingMore && (
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+            )}
+          </div>
+        )}
+      </div>
+    );
+  },
+);
