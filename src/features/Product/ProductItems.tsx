@@ -79,20 +79,33 @@ export const ProductItems = () => {
         onSearch={handleSearch}
       />
 
-      {viewMode === 'grid' ? (
-        <Grid
-          product={allItems}
-          hasMore={hasMore}
-          isLoadingMore={isLoadingMore}
-          ref={ref}
-        />
+      {allItems.length === 0 && searchQuery ? (
+        <div className="text-center py-8 text-gray-500">
+          일치하는 결과가 없습니다.
+        </div>
       ) : (
-        <List
-          product={allItems}
-          hasMore={hasMore}
-          isLoadingMore={isLoadingMore}
-          ref={ref}
-        />
+        <>
+          {viewMode === 'grid' ? (
+            <Grid
+              product={allItems}
+              hasMore={hasMore}
+              isLoadingMore={isLoadingMore}
+              ref={ref}
+            />
+          ) : (
+            <List
+              product={allItems}
+              hasMore={hasMore}
+              isLoadingMore={isLoadingMore}
+              ref={ref}
+            />
+          )}
+          {!hasMore && allItems.length > 0 && (
+            <div className="text-center py-4 text-gray-500">
+              더 이상 불러올 수 없습니다.
+            </div>
+          )}
+        </>
       )}
     </section>
   );
