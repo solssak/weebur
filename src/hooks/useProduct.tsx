@@ -74,7 +74,6 @@ export const useProducts = (): UseProductsReturn => {
   };
 
   const search = async (query: string) => {
-    if (!query.trim()) return;
     setSearchQuery(query);
     if (typeof window !== 'undefined') {
       localStorage.setItem('searchQuery', query);
