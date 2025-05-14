@@ -60,12 +60,17 @@ export const useProducts = (): UseProductsReturn => {
       setProducts((prev) =>
         shouldReset ? newProducts : [...prev, ...newProducts],
       );
-      setPage((prev) => prev + 1);
     } catch (error) {
       console.error('데이터를 불러오는데 에러가 발생했습니다.', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const loadMore = async () => {
+    if (isLoading) return;
+    setPage(page + 1);
+    await loadProducts(page + 1);
   };
 
   const search = async (query: string) => {
@@ -104,7 +109,7 @@ export const useProducts = (): UseProductsReturn => {
     hasMore,
     searchQuery,
     setSearchQuery,
-    loadMore: () => loadProducts(page),
+    loadMore,
     search,
     sort,
   };
