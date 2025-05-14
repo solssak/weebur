@@ -8,6 +8,8 @@ import { useInView } from 'react-intersection-observer';
 import { Grid } from './Grid';
 import { List } from './List';
 import { SearchForm } from './SearchForm';
+import { LoadingSpinner } from '@/ui/LoadingSpinner';
+import { StatusMessage } from '@/ui/StatusMessage';
 
 export const ProductItems = () => {
   const [ref, inView] = useInView();
@@ -41,7 +43,6 @@ export const ProductItems = () => {
           }
 
           setAllItems((prev) => [...prev, ...products]);
-
           setPage((prev) => prev + 1);
         } catch (error) {
           console.error('데이터를 불러오는데 에러가 발생했습니다.', error);
@@ -52,7 +53,7 @@ export const ProductItems = () => {
     };
 
     loadProducts();
-  }, [inView, isLoadingMore, hasMore, page]);
+  }, [inView]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,15 +62,24 @@ export const ProductItems = () => {
     setPage(1);
     setAllItems([]);
     setHasMore(true);
+    try {
+      const { products } = await fetchProducts({
+        query: searchQuery,
+        page: 1,
+      });
 
-    const { products } = await fetchProducts({
-      query: searchQuery,
-      page: 1,
-    });
-
-    setAllItems(products);
-    setPage(2);
+      setAllItems(products);
+      setPage(2);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
+
+  const isEmptyResult = allItems.length === 0 && searchQuery;
+  const isEndOfList = !hasMore && allItems.length > 0;
+  const shouldShowSpinner = hasMore || isLoadingMore;
 
   return (
     <section className="m-auto max-w-7xl">
@@ -79,31 +89,20 @@ export const ProductItems = () => {
         onSearch={handleSearch}
       />
 
-      {allItems.length === 0 && searchQuery ? (
-        <div className="text-center py-8 text-gray-500">
-          일치하는 결과가 없습니다.
-        </div>
+      {viewMode === 'grid' ? (
+        <Grid product={allItems} />
+      ) : (
+        <List product={allItems} />
+      )}
+
+      {isEndOfList && <StatusMessage message="더 이상 불러올 수 없습니다." />}
+
+      {shouldShowSpinner ? (
+        <LoadingSpinner ref={ref} />
       ) : (
         <>
-          {viewMode === 'grid' ? (
-            <Grid
-              product={allItems}
-              hasMore={hasMore}
-              isLoadingMore={isLoadingMore}
-              ref={ref}
-            />
-          ) : (
-            <List
-              product={allItems}
-              hasMore={hasMore}
-              isLoadingMore={isLoadingMore}
-              ref={ref}
-            />
-          )}
-          {!hasMore && allItems.length > 0 && (
-            <div className="text-center py-4 text-gray-500">
-              더 이상 불러올 수 없습니다.
-            </div>
+          {isEmptyResult && (
+            <StatusMessage message="일치하는 결과가 없습니다." />
           )}
         </>
       )}
