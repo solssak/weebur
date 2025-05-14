@@ -13,22 +13,33 @@ interface UseProductsReturn {
   sort: (sortBy: string | null, order: 'asc' | 'desc' | null) => Promise<void>;
 }
 
+const getInitialSearchQuery = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('searchQuery') || '';
+  }
+  return '';
+};
+
+const getInitialSortState = () => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('sortQuery');
+    if (saved) {
+      const { sortBy, order } = JSON.parse(saved);
+      return { sortBy, order };
+    }
+  }
+  return { sortBy: null, order: null };
+};
+
 export const useProducts = (): UseProductsReturn => {
   const [page, setPage] = useState<number>(1);
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const [searchQuery, setSearchQuery] = useState<string>(() => {
-    return localStorage.getItem('searchQuery') || '';
-  });
-  const [sortBy, setSortBy] = useState<string | null>(() => {
-    const saved = localStorage.getItem('sortQuery');
-    return saved ? JSON.parse(saved).sortBy : null;
-  });
-  const [order, setOrder] = useState<'asc' | 'desc' | null>(() => {
-    const saved = localStorage.getItem('sortQuery');
-    return saved ? JSON.parse(saved).order : null;
-  });
+  const [searchQuery, setSearchQuery] = useState<string>(getInitialSearchQuery);
+  const { sortBy: initialSortBy, order: initialOrder } = getInitialSortState();
+  const [sortBy, setSortBy] = useState<string | null>(initialSortBy);
+  const [order, setOrder] = useState<'asc' | 'desc' | null>(initialOrder);
 
   const loadProducts = async (
     currentPage: number,
@@ -61,7 +72,9 @@ export const useProducts = (): UseProductsReturn => {
   const search = async (query: string) => {
     if (!query.trim()) return;
     setSearchQuery(query);
-    localStorage.setItem('searchQuery', query);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('searchQuery', query);
+    }
     setPage(1);
     setProducts([]);
     setHasMore(true);
@@ -74,10 +87,12 @@ export const useProducts = (): UseProductsReturn => {
   ) => {
     setSortBy(newSortBy);
     setOrder(newOrder);
-    localStorage.setItem(
-      'sortQuery',
-      JSON.stringify({ sortBy: newSortBy, order: newOrder }),
-    );
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(
+        'sortQuery',
+        JSON.stringify({ sortBy: newSortBy, order: newOrder }),
+      );
+    }
     setPage(1);
     setProducts([]);
     setHasMore(true);
