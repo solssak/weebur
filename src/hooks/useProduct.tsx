@@ -14,19 +14,15 @@ interface UseProductsReturn {
 }
 
 const getInitialSearchQuery = () => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('searchQuery') || '';
-  }
-  return '';
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem('searchQuery') || '';
 };
 
 const getInitialSortState = () => {
-  if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('sortQuery');
-    if (saved) {
-      const { sortBy, order } = JSON.parse(saved);
-      return { sortBy, order };
-    }
+  if (typeof window === 'undefined') return { sortBy: null, order: null };
+  const savedSortQuery = localStorage.getItem('sortQuery');
+  if (savedSortQuery) {
+    return JSON.parse(savedSortQuery);
   }
   return { sortBy: null, order: null };
 };
@@ -45,6 +41,7 @@ export const useProducts = (): UseProductsReturn => {
     currentPage: number,
     currentSortBy = sortBy,
     currentOrder = order,
+    shouldReset = false,
   ) => {
     try {
       setIsLoading(true);
@@ -60,7 +57,9 @@ export const useProducts = (): UseProductsReturn => {
         return;
       }
 
-      setProducts((prev) => [...prev, ...newProducts]);
+      setProducts((prev) =>
+        shouldReset ? newProducts : [...prev, ...newProducts],
+      );
       setPage((prev) => prev + 1);
     } catch (error) {
       console.error('데이터를 불러오는데 에러가 발생했습니다.', error);
@@ -78,7 +77,7 @@ export const useProducts = (): UseProductsReturn => {
     setPage(1);
     setProducts([]);
     setHasMore(true);
-    await loadProducts(1);
+    await loadProducts(1, sortBy, order, true);
   };
 
   const sort = async (
@@ -96,7 +95,7 @@ export const useProducts = (): UseProductsReturn => {
     setPage(1);
     setProducts([]);
     setHasMore(true);
-    await loadProducts(1, newSortBy, newOrder);
+    await loadProducts(1, newSortBy, newOrder, true);
   };
 
   return {
