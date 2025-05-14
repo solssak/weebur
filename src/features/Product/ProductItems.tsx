@@ -54,7 +54,7 @@ export const ProductItems = () => {
 
   return (
     <section className="m-auto max-w-7xl">
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center mb-4">
         <SearchForm
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}

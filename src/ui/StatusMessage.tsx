@@ -9,7 +9,7 @@ export const StatusMessage = ({
 }: StatusMessageProps) => {
   return (
     <div
-      className={`text-center text-gray-500 py-4 ${className}`}
+      className={`text-gray-500 mb-4 w-full flex justify-center items-center ${className}`}
       role="status"
     >
       {message}
