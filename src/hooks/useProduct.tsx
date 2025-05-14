@@ -1,5 +1,5 @@
 import { ProductItem } from '@/types/Product';
-import { fetchProducts } from '@/utils/search';
+import { fetchProducts } from '@/utils/fetchProducts';
 import { useState } from 'react';
 
 interface UseProductsReturn {
