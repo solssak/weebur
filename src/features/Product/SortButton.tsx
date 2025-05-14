@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 
 interface SortButtonProps {
@@ -14,10 +16,12 @@ export const SortButton = ({ onSort }: SortButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const savedSortQuery = localStorage.getItem('sortQuery');
-    if (savedSortQuery) {
-      const { sortBy, order } = JSON.parse(savedSortQuery);
-      onSort(sortBy, order);
+    if (typeof window !== 'undefined') {
+      const savedSortQuery = localStorage.getItem('sortQuery');
+      if (savedSortQuery) {
+        const { sortBy, order } = JSON.parse(savedSortQuery);
+        onSort(sortBy, order);
+      }
     }
   }, []);
 

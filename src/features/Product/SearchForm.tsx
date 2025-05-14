@@ -14,8 +14,10 @@ export const SearchForm = ({
   onSearch,
 }: SearchFormProps) => {
   useEffect(() => {
-    const savedQuery = localStorage.getItem('searchQuery');
-    if (savedQuery) onSearchQueryChange(savedQuery);
+    if (typeof window !== 'undefined') {
+      const savedQuery = localStorage.getItem('searchQuery');
+      if (savedQuery) onSearchQueryChange(savedQuery);
+    }
   }, []);
 
   const handleSearchQueryChange = (query: string) => {

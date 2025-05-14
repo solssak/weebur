@@ -27,12 +27,16 @@ export const ProductItems = () => {
   } = useProducts();
 
   useEffect(() => {
-    setViewMode(initializeViewMode());
+    if (typeof window !== 'undefined') {
+      setViewMode(initializeViewMode());
+    }
   }, []);
 
   useEffect(() => {
-    if (inView && !isLoading && hasMore) {
-      loadMore();
+    if (typeof window !== 'undefined') {
+      if (inView && !isLoading && hasMore) {
+        loadMore();
+      }
     }
   }, [inView, isLoading, hasMore, loadMore]);
 
@@ -63,11 +67,16 @@ export const ProductItems = () => {
         <SortButton onSort={handleSort} />
       </div>
 
-      {viewMode === 'grid' ? (
-        <Grid product={products} />
-      ) : (
-        <List product={products} />
-      )}
+      {(() => {
+        switch (viewMode) {
+          case 'grid':
+            return <Grid product={products} />;
+          case 'list':
+            return <List product={products} />;
+          default:
+            return null;
+        }
+      })()}
 
       {isEndOfList && <StatusMessage message="더 이상 불러올 수 없습니다." />}
 
